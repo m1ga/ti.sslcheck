@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86 x86_64
+description: Receives server info made by TiHTTPClient
+author: Michael Gangolf
+license: MIT
+copyright: Copyright (c) 2022 Michael Gangolf
+
+# these should not be edited
+name: ti.sslcheck
+moduleid: ti.sslcheck
+guid: 28baebe5-31ac-446e-9e58-5788665ae318
+platform: android
+minsdk: 9.0.0
