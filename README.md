@@ -9,6 +9,7 @@ Titanium module to get infos about the SSL certificate.
 ## Usage
 
 Same as the appcelerator.https module: create a `createSecurityManager` and attach it to `securityManager` of your HTTPClient connection.
+_Note:_ `securityManager` is "creation only".
 
 ## Example
 
