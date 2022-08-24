@@ -1,0 +1,19 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 2
+architectures: arm64 x86_64
+mac: false
+description: ti.sslcheck
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2022 by Your Company
+
+# these should not be edited
+name: ti.sslcheck
+moduleid: ti.sslcheck
+guid: ffbd064e-b922-423e-99e1-138a23f16ab5
+platform: iphone
+minsdk: 11.0.0.GA
