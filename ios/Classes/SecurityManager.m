@@ -270,10 +270,13 @@
   
   // Handle Two-phase mutual client-authentification
   if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodClientCertificate] && pinnedClientCertificate != nil) {
+    NSLog(@"[ERROR] Error in NSURLAuthenticationMethodClientCertificate");
     return;
   }
   
   if (![authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+    NSLog(@"[ERROR] Not NSURLAuthenticationMethodServerTrust");
+
     [challenge.sender cancelAuthenticationChallenge:challenge];
     completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
     return;
@@ -283,11 +286,15 @@
   // called with a URL the security manager was not configured to
   // handle.
   if (![self willHandleURL:task.currentRequest.URL]) {
+    NSLog(@"[ERROR] Cannot handle");
+
     return;
   }
   
   SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
   if (serverTrust == nil) {
+    NSLog(@"[ERROR] No server trust");
+
     return;
   }
   
@@ -298,8 +305,10 @@
   SecTrustResultType result = 0;
   OSStatus status = SecTrustEvaluate(serverTrust, &result);
   if (status != errSecSuccess) {
+    NSLog(@"[ERROR] Evaluation failed");
     return;
   }
+  
   DebugLog(@"%s SecTrustEvaluate returned %@", __PRETTY_FUNCTION__, @(status));
   
   // Get the PinnedURL for this server.
@@ -308,6 +317,8 @@
   // It is a logic error (a bug in this SecurityManager class) if this
   // security manager does not have a PinnedURL for this server.
   if (pinnedPublicKey == nil) {
+    NSLog(@"[ERROR] No public key");
+
     return;
   }
   DebugLog(@"%s host %@ pinned to publicKey %@", __PRETTY_FUNCTION__, host, pinnedPublicKey);
@@ -325,6 +336,8 @@
   // Obtain the server's X509 certificate and public key.
   SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, pinnedPublicKey.trustChainIndex);
   if (serverCertificate == nil) {
+    NSLog(@"[ERROR] No server certificate");
+
     return;
   }
   
@@ -332,15 +345,17 @@
   // certificate.
   X509Certificate *x509Certificate = [X509Certificate x509CertificateWithSecCertificate:serverCertificate andTrustChainIndex:pinnedPublicKey.trustChainIndex];
   if (x509Certificate == nil) {
+    NSLog(@"[ERROR] Certificate wrapper failed");
+
     return;
   }
   
   NSDictionary *event = @{
     @"fingerprint": x509Certificate.SHA1Fingerprint,
-    @"issuedByDName": x509Certificate.names
+    @"issuedByDName": x509Certificate.names.firstObject
   };
   
-  [_proxy fireEvent:@"sslcheck" withObject:event];
+  [_proxy fireEvent:@"sslCheck" withObject:event];
   
   NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
   [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
