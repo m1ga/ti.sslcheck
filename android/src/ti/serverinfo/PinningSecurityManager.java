@@ -32,7 +32,7 @@ public class PinningSecurityManager extends KrollProxy implements SecurityManage
     @Override
     public X509TrustManager[] getTrustManagers(HTTPClientProxy proxy) {
         try {
-            PinningTrustManager tm = new PinningTrustManager(proxy, proxy.getLocation(), 0);
+            PinningTrustManager tm = new PinningTrustManager(proxy, proxy.getLocation(), 0, this);
             return new X509TrustManager[]{tm};
         } catch (Exception e) {
             Log.e(SSLCheckModule.TAG, "Unable to create PinningTrustManager. Returning null.", e);

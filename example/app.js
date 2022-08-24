@@ -12,10 +12,13 @@ const httpClient = Ti.Network.createHTTPClient({
 	securityManager: securityManager
 });
 
-httpClient.addEventListener('sslCheck', e => {
+securityManager.addEventListener('sslCheck', e => {
+  // iOS / Android
 	console.log('fingerprint', e.fingerprint);
-	console.log('issuedByCName', e.issuedByCName);
 	console.log('issuedByDName', e.issuedByDName);
+
+  // Android only
+  console.log('issuedByCName', e.issuedByCName);
 	console.log('issuedByOName', e.issuedByOName);
 	console.log('issuedByUName', e.issuedByUName);
 	console.log('issuedToCName', e.issuedToCName);
