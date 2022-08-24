@@ -3,6 +3,7 @@ package ti.sslcheck;
 import android.net.http.SslCertificate;
 
 import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.common.Log;
 
 import java.security.KeyStore;
@@ -21,8 +22,9 @@ public class PinningTrustManager implements X509TrustManager {
 
     private final HTTPClientProxy proxy;
     private final X509TrustManager standardTrustManager;
+    private KrollProxy securityManager;
 
-    protected PinningTrustManager(HTTPClientProxy proxy, String supportedHosts, int trustChainIndex)
+    protected PinningTrustManager(HTTPClientProxy proxy, String supportedHosts, int trustChainIndex, KrollProxy securityManager)
             throws Exception {
         TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         factory.init((KeyStore) null);
@@ -31,6 +33,7 @@ public class PinningTrustManager implements X509TrustManager {
             throw new NoSuchAlgorithmException("No trust-manager found");
         }
         this.standardTrustManager = (X509TrustManager) trustmanagers[0];
+        this.securityManager = securityManager;
         this.proxy = proxy;
     }
 
@@ -84,7 +87,7 @@ public class PinningTrustManager implements X509TrustManager {
         kd.put("validNotAfter", sslCertificate.getValidNotAfterDate());
         kd.put("validNotBefore", sslCertificate.getValidNotBeforeDate());
 
-        proxy.fireEvent("sslCheck", kd);
+        this.securityManager.fireEvent("sslCheck", kd);
     }
 
     @Override
