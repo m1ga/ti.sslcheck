@@ -1,3 +1,4 @@
 /test_sslcheck
-/ios/dist
-/ios/build
+dist
+build
+.DS_STORE
