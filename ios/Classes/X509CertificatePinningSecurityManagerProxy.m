@@ -36,7 +36,6 @@ static dispatch_queue_t syncQueue;
 
     dispatch_sync(syncQueue, ^{
       ++proxyCount;
-      NSString *proxyName = [NSString stringWithFormat:@"%@ %d", NSStringFromClass(self.class), proxyCount];
     });
   }
 

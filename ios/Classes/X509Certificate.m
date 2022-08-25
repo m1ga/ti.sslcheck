@@ -39,12 +39,6 @@
       @throw exception;
     }
 
-#ifdef DEBUG
-    // CFBridgingRelease transfer's ownership of the CFStringRef
-    // returned by CFCopyDescription to ARC.
-    NSString *secCertificateDescription = (NSString *)CFBridgingRelease(CFCopyDescription(secCertificate));
-#endif
-
     _SecCertificate = (SecCertificateRef)CFRetain(secCertificate);
     _trustChainIndex = trustChainIndex;
   }
@@ -124,25 +118,28 @@
 
 - (NSString *)issuedByCName
 {
-  NSData *certificateData = (__bridge NSData *) SecCertificateCopyData(self.SecCertificate);
-  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:certificateData];
+  CFDataRef certificateData = SecCertificateCopyData(self.SecCertificate);
+  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:(__bridge NSData *)certificateData];
+  CFRelease(certificateData);
   
   return wrapper.commonName;
 }
 
 - (NSDate *)validNotAfter
 {
-  NSData *certificateData = (__bridge NSData *) SecCertificateCopyData(self.SecCertificate);
-  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:certificateData];
-  
+  CFDataRef certificateData = SecCertificateCopyData(self.SecCertificate);
+  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:(__bridge NSData *)certificateData];
+  CFRelease(certificateData);
+
   return wrapper.validDates[@"notValidAfterDate"];
 }
 
 - (NSDate *)validNotBefore
 {
-  NSData *certificateData = (__bridge NSData *) SecCertificateCopyData(self.SecCertificate);
-  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:certificateData];
-  
+  CFDataRef certificateData = SecCertificateCopyData(self.SecCertificate);
+  SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:(__bridge NSData *)certificateData];
+  CFRelease(certificateData);
+
   return wrapper.validDates[@"notValidBeforeDate"];
 }
 
@@ -175,12 +172,7 @@
   
   d2i_X509(&x509,&ptr,len);
 
-  X509_NAME * names_s = X509_get_subject_name(x509);
-  X509_NAME * names_i = X509_get_issuer_name(x509);
   GENERAL_NAMES * sANs = X509_get_ext_d2i( x509, NID_subject_alt_name, 0, 0 );
-
-  // ASN1_INTEGER *serial = X509_get_serialNumber(x509);
-  // unsigned  long s = ASN1_INTEGER_get(serial);
   
   int i, numAN = sk_GENERAL_NAME_num( sANs );
   NSMutableArray * out = [NSMutableArray arrayWithCapacity:numAN];
@@ -197,6 +189,8 @@
           }
       }
   }
+  
+  CFRelease(der);
   
   return out;
 }

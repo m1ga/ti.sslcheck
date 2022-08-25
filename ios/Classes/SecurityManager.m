@@ -85,9 +85,6 @@
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *_Nullable))completionHandler
 {
-  // Normalize the server's host name to lower case.
-  NSString *host = [task.currentRequest.URL.host lowercaseString];
-  
   // Get the PinnedURL for this server.
   NSString *authenticationMethod = [[challenge protectionSpace] authenticationMethod];
   
@@ -131,14 +128,6 @@
     NSLog(@"[ERROR] Evaluation failed");
     return;
   }
-
-  CFIndex count = SecTrustGetCertificateCount(serverTrust);
-  CFIndex i = 0;
-  
-  for (i = 0; i < count; i++) {
-    SecCertificateRef item = SecTrustGetCertificateAtIndex(serverTrust, i);
-    NSString *desc = (NSString *)CFBridgingRelease(CFCopyDescription(item));
-  }
   
   // Obtain the server's X509 certificate and public key.
   SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0);
@@ -171,9 +160,6 @@
 
 - (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-  // Normalize the server's host name to lower case.
-  NSString *host = [connection.currentRequest.URL.host lowercaseString];
-
   // Get the PinnedURL for this server.
   NSString *authenticationMethod = [[challenge protectionSpace] authenticationMethod];
 
@@ -195,9 +181,6 @@
   if (status != errSecSuccess) {
     return [challenge.sender cancelAuthenticationChallenge:challenge];
   }
-
-  CFIndex count = SecTrustGetCertificateCount(serverTrust);
-  CFIndex i = 0;
 
   // Obtain the server's X509 certificate and public key.
   SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0);
