@@ -33,4 +33,4 @@ MIT
 
 ## Example
 
-See <a href="./example/app.js">example/app.js</a> for details
+For a full example have a look at: <a href="./example/app.js">example/app.js</a>
