@@ -8,14 +8,12 @@
 
 + (instancetype)publicKeyWithX509Certificate:(X509Certificate *)x509Certificate
 {
-  DebugLog(@"%s", __PRETTY_FUNCTION__);
   return [[PublicKey alloc] initWithX509Certificate:x509Certificate];
 }
 
 // Designated initializer.
 - (instancetype)initWithX509Certificate:(X509Certificate *)x509Certificate
 {
-  DebugLog(@"%s x509Certificate = %@", __PRETTY_FUNCTION__, x509Certificate);
   self = [super init];
   if (self) {
     if (!(nil != x509Certificate)) {
@@ -35,8 +33,6 @@
       policy = SecPolicyCreateBasicX509();
       OSStatus status = SecTrustCreateWithCertificates(x509Certificate.SecCertificate, policy, &trust);
 
-      DebugLog(@"%s SecTrustCreateWithCertificates returned %@ for %@", __PRETTY_FUNCTION__, @(status), x509Certificate);
-
       if (!(errSecSuccess == status)) {
         NSString *reason = [NSString stringWithFormat:@"SecTrustCreateWithCertificates returned result code %@", @(status)];
         NSDictionary *userInfo = @{ @"OSStatus" : @(status) };
@@ -52,8 +48,6 @@
       // SecTrustCopyPublicKey.
       SecTrustResultType result = 0;
       status = SecTrustEvaluate(trust, &result);
-
-      DebugLog(@"%s SecTrustEvaluate returned %@", __PRETTY_FUNCTION__, @(status));
 
       if (!(errSecSuccess == status)) {
         NSString *reason = [NSString stringWithFormat:@"SecTrustEvaluate returned result code %@", @(status)];
@@ -84,11 +78,9 @@
       // CFBridgingRelease transfer's ownership of the CFStringRef
       // returned by CFCopyDescription to ARC.
       NSString *secKeyDescription = (NSString *)CFBridgingRelease(CFCopyDescription(_SecKey));
-      NSLog(@"%s SecTrustCopyPublicKey returned %@", __PRETTY_FUNCTION__, secKeyDescription);
 #endif
     }
     @catch (NSException *exception) {
-      DebugLog(@"%s caught exception %@", __PRETTY_FUNCTION__, exception);
       // Rethrow the exception so it's handled at a higher level.
       @throw;
     }

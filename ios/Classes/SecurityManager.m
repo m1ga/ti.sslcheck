@@ -23,15 +23,12 @@
 
 + (instancetype)securityManagerWithPinnedUrlSet:(NSSet *)pinnedUrlSet andProxy:(TiProxy *)proxy
 {
-  DebugLog(@"%s", __PRETTY_FUNCTION__);
   return [[SecurityManager alloc] initWithPinnedURLs:pinnedUrlSet andProxy:proxy];
 }
 
 // Designated initializer.
 - (instancetype)initWithPinnedURLs:(NSSet *)pinnedUrlSet andProxy:(TiProxy *)proxy
 {
-  DebugLog(@"%s pinnedUrlSet = %@", __PRETTY_FUNCTION__, pinnedUrlSet);
-
   self = [super init];
   self.proxy = proxy;
 
@@ -56,7 +53,6 @@
 // handle this URL.
 - (BOOL)willHandleURL:(NSURL *)url
 {
-  DebugLog(@"%s url = %@", __PRETTY_FUNCTION__, url);
   if (url == nil) {
     return NO;
   }
@@ -67,7 +63,6 @@
 // If this security manager was configured to handle this url then return self.
 - (id<APSConnectionDelegate>)connectionDelegateForUrl:(NSURL *)url
 {
-  DebugLog(@"%s url = %@", __PRETTY_FUNCTION__, url);
   return self;
 }
 
@@ -90,10 +85,8 @@
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *_Nullable))completionHandler
 {
-  DebugLog(@"%s session = %@, challenge = %@", __PRETTY_FUNCTION__, session, challenge);
   // Normalize the server's host name to lower case.
   NSString *host = [task.currentRequest.URL.host lowercaseString];
-  DebugLog(@"%s Normalized host name = %@", __PRETTY_FUNCTION__, host);
   
   // Get the PinnedURL for this server.
   NSString *authenticationMethod = [[challenge protectionSpace] authenticationMethod];
@@ -138,17 +131,13 @@
     NSLog(@"[ERROR] Evaluation failed");
     return;
   }
-  
-  DebugLog(@"%s SecTrustEvaluate returned %@", __PRETTY_FUNCTION__, @(status));
-    
+
   CFIndex count = SecTrustGetCertificateCount(serverTrust);
   CFIndex i = 0;
-  DebugLog(@"Number of certificates: %ld", count);
   
   for (i = 0; i < count; i++) {
     SecCertificateRef item = SecTrustGetCertificateAtIndex(serverTrust, i);
     NSString *desc = (NSString *)CFBridgingRelease(CFCopyDescription(item));
-    DebugLog(@"%ld: %@", i, desc);
   }
   
   // Obtain the server's X509 certificate and public key.
@@ -182,11 +171,8 @@
 
 - (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-  DebugLog(@"%s connection = %@, challenge = %@", __PRETTY_FUNCTION__, connection, challenge);
-
   // Normalize the server's host name to lower case.
   NSString *host = [connection.currentRequest.URL.host lowercaseString];
-  DebugLog(@"%s Normalized host name = %@", __PRETTY_FUNCTION__, host);
 
   // Get the PinnedURL for this server.
   NSString *authenticationMethod = [[challenge protectionSpace] authenticationMethod];
@@ -197,7 +183,6 @@
 
   SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
   if (serverTrust == nil) {
-    DebugLog(@"%s FAIL: challenge.protectionSpace.serverTrust is nil", __PRETTY_FUNCTION__);
     return [challenge.sender cancelAuthenticationChallenge:challenge];
   }
 
@@ -208,19 +193,15 @@
   SecTrustResultType result = 0;
   OSStatus status = SecTrustEvaluate(serverTrust, &result);
   if (status != errSecSuccess) {
-    DebugLog(@"%s FAIL: standard TLS validation failed. SecTrustEvaluate returned %@", __PRETTY_FUNCTION__, @(status));
     return [challenge.sender cancelAuthenticationChallenge:challenge];
   }
-  DebugLog(@"%s SecTrustEvaluate returned %@", __PRETTY_FUNCTION__, @(status));
 
   CFIndex count = SecTrustGetCertificateCount(serverTrust);
   CFIndex i = 0;
-  DebugLog(@"Number of certificates: %ld", count);
 
   // Obtain the server's X509 certificate and public key.
   SecCertificateRef serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0);
   if (serverCertificate == nil) {
-    DebugLog(@"%s FAIL: Could not find the server's X509 certificate in serverTrust", __PRETTY_FUNCTION__);
     return [challenge.sender cancelAuthenticationChallenge:challenge];
   }
 
@@ -239,7 +220,6 @@
     @throw exception;
   }
 
-  DebugLog(@"%s server's X509 certificate = %@", __PRETTY_FUNCTION__, x509Certificate);
   // Get the public key from this server's X509 certificate.
   PublicKey *serverPublicKey = x509Certificate.publicKey;
   if (serverPublicKey == nil) {
@@ -250,8 +230,6 @@
                                                    userInfo:userInfo];
     @throw exception;
   }
-
-  DebugLog(@"%s server's public key = %@", __PRETTY_FUNCTION__, serverPublicKey);
 
   // Return success since the server holds the private key
   // corresponding to the public key held bu this security manager.

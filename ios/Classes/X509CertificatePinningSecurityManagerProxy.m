@@ -37,7 +37,6 @@ static dispatch_queue_t syncQueue;
     dispatch_sync(syncQueue, ^{
       ++proxyCount;
       NSString *proxyName = [NSString stringWithFormat:@"%@ %d", NSStringFromClass(self.class), proxyCount];
-      DebugLog(@"proxyId = %@, proxyName = %@", @(proxyCount), proxyName);
     });
   }
 
@@ -46,11 +45,8 @@ static dispatch_queue_t syncQueue;
 
 - (id)_initWithPageContext:(id<TiEvaluator>)context_ args:(NSArray *)args
 {
-  DebugLog(@"%s %@", __PRETTY_FUNCTION__, args);
-
   if (self = [super _initWithPageContext:context_]) {
     _securityManager = [SecurityManager securityManagerWithPinnedUrlSet:NSSet.set andProxy:self];
-    DebugLog(@"%s securityManager = %@", __PRETTY_FUNCTION__, _securityManager);
   }
   return self;
 }
@@ -60,14 +56,12 @@ static dispatch_queue_t syncQueue;
 // Delegate to the SecurityManager.
 - (BOOL)willHandleURL:(NSURL *)url
 {
-  DebugLog(@"%s url = %@", __PRETTY_FUNCTION__, url);
   return [self.securityManager willHandleURL:url];
 }
 
 // Delegate to the SecurityManager.
 - (id<APSConnectionDelegate>)connectionDelegateForUrl:(NSURL *)url
 {
-  DebugLog(@"%s url = %@", __PRETTY_FUNCTION__, url);
   return [self.securityManager connectionDelegateForUrl:url];
 }
 

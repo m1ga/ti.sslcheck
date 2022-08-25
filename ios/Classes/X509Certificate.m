@@ -14,13 +14,11 @@
 
 + (instancetype)x509CertificateWithSecCertificate:(SecCertificateRef)secCertificate andTrustChainIndex:(NSInteger)trustChainIndex
 {
-  DebugLog(@"%s", __PRETTY_FUNCTION__);
   return [[X509Certificate alloc] initWithSecCertificate:secCertificate andTrustChainIndex:trustChainIndex];
 }
 
 + (instancetype)x509CertificateWithURL:(NSURL *)url andTrustChainIndex:(NSInteger)trustChainIndex
 {
-  DebugLog(@"%s", __PRETTY_FUNCTION__);
   return [[X509Certificate alloc] initWithURL:url andTrustChainIndex:trustChainIndex];
 }
 
@@ -45,7 +43,6 @@
     // CFBridgingRelease transfer's ownership of the CFStringRef
     // returned by CFCopyDescription to ARC.
     NSString *secCertificateDescription = (NSString *)CFBridgingRelease(CFCopyDescription(secCertificate));
-    NSLog(@"%s secCertificate = %@", __PRETTY_FUNCTION__, secCertificateDescription);
 #endif
 
     _SecCertificate = (SecCertificateRef)CFRetain(secCertificate);
@@ -57,7 +54,6 @@
 
 - (instancetype)initWithURL:(NSURL *)url andTrustChainIndex:(NSInteger)trustChainIndex
 {
-  DebugLog(@"%s url = %@", __PRETTY_FUNCTION__, url);
   // The URL must not be nill
   if (!(nil != url)) {
     NSString *reason = @"url must not be nil";
@@ -80,8 +76,6 @@
                                                    userInfo:userInfo];
     @throw exception;
   }
-
-  DebugLog(@"%s dataWithContentsOfURL returned %@ bytes", __PRETTY_FUNCTION__, @(certificateNSData.length));
 
   // __bridge means do not transfer ownership from Objective-C ARC.
   CFDataRef certificateCFData = (__bridge CFDataRef)certificateNSData;
