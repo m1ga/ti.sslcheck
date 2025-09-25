@@ -121,7 +121,7 @@
   CFDataRef certificateData = SecCertificateCopyData(self.SecCertificate);
   SecCertificateWrapper *wrapper = [[SecCertificateWrapper alloc] initWithData:(__bridge NSData *)certificateData];
   CFRelease(certificateData);
-  
+
   return wrapper.commonName;
 }
 
@@ -147,7 +147,7 @@
 {
     SecCertificateRef certificate = self.SecCertificate;
     NSData *data = CFBridgingRelease(SecCertificateCopyData(certificate));
-  
+
     const NSUInteger length = CC_SHA1_DIGEST_LENGTH;
     unsigned char buffer[length];
 
@@ -169,11 +169,11 @@
   const unsigned char * ptr = CFDataGetBytePtr(der);
   long len = CFDataGetLength(der);
   X509 *x509 = NULL;
-  
+
   d2i_X509(&x509,&ptr,len);
 
   GENERAL_NAMES * sANs = X509_get_ext_d2i( x509, NID_subject_alt_name, 0, 0 );
-  
+
   int i, numAN = sk_GENERAL_NAME_num( sANs );
   NSMutableArray * out = [NSMutableArray arrayWithCapacity:numAN];
 
@@ -189,9 +189,9 @@
           }
       }
   }
-  
+
   CFRelease(der);
-  
+
   return out;
 }
 
