@@ -5,7 +5,7 @@
 #import "TiSslcheckModule.h"
 #import "PublicKey.h"
 #import "ti_sslcheck-Swift.h"
-#include <openssl/x509v3.h>
+#include <x509v3.h>
 #import <CommonCrypto/CommonCrypto.h>
 
 @implementation X509Certificate
